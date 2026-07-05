@@ -1,0 +1,70 @@
+:root {
+    --main-green: #24b464;
+    --bg-mint: #d8f3e5;
+}
+
+body {
+    background-color: var(--bg-mint);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bg-custom-green {
+    background-color: var(--main-green) !important;
+}
+
+.product-card {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e2e8f0;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.category-btn {
+    background-color: #e2e8f0;
+    color: #4a5568;
+    font-weight: bold;
+    border: none;
+    min-width: 110px;
+}
+
+.category-btn.active {
+    background-color: white !important;
+    color: var(--main-green) !important;
+    border: 2px solid var(--main-green) !important;
+}
+
+.checkout-panel {
+    background-color: white;
+    border-radius: 20px;
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-items-container {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.qty-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--main-green);
+    background: white;
+    color: var(--main-green);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.qty-btn:hover {
+    background: var(--main-green);
+    color: white;
+}

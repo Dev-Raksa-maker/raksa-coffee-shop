@@ -1,0 +1,30 @@
+body {
+    background-color: #F8F9F3;
+    font-family: sans-serif;
+    overflow: visible;
+    padding-top: 70px;
+    /* roboto-font */
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 5px;
+    font-style: normal;
+    font-variation-settings:
+        "wdth" 100;
+
+}
+
+.bg-alert-yellow {
+    background-color: #E2F542;
+}
+
+.text-custom-purple {
+    color: #4F2382;
+}
+
+.bg-custom-purple {
+    background-color: #4F2382;
+}
+
+.rounded-custom {
+    border-radius: 1rem;
+}

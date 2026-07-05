@@ -1,0 +1,16 @@
+body {
+    background-color: #F8F9F3;
+    overflow: visible;
+    margin-top: 80px;
+    /* roboto-font */
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 5px;
+    font-style: normal;
+    font-variation-settings:
+        "wdth" 100;
+}
+
+.bg-custom-green {
+    background-color: #2EBA7F;
+}
