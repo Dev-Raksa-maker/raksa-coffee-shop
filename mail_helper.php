@@ -8,7 +8,7 @@ function sendVerificationEmail($user_email, $user_name, $otp_code) {
     $mail = new PHPMailer(true);
 
     try {
-        // ⚙️ វគ្គកំណត់រចនាសម្ព័ន្ធក្បាលម៉ាស៊ីន SMTP របស់ Google
+        // Configure Google SMTP header
         $mail->isSMTP();
         $mail->Timeout = 15;
         $mail->SMTPConnectTimeout = 15;
@@ -20,8 +20,8 @@ function sendVerificationEmail($user_email, $user_name, $otp_code) {
         $mail->Port       = 587;                                  
         $mail->CharSet    = 'UTF-8';                              
 
-        // 🔒 សំខាន់បំផុតសម្រាប់ Localhost XAMPP
-        // វាបង្ខំឱ្យប្រព័ន្ធរំលងការឆែក SSL Certificate លើ Windows ទើបផ្ញើចេញទៅក្រៅលោកបាន
+        // Most important for Localhost XAMPP
+        // It forces the system to skip checking the SSL Certificate on Windows before sending it out to the world
         $mail->SMTPOptions = array(
             'ssl' => array(
                 'verify_peer' => false,
@@ -30,12 +30,12 @@ function sendVerificationEmail($user_email, $user_name, $otp_code) {
             )
         );
 
-        // 👥 វគ្គកំណត់អ្នកផ្ញើ និងអ្នកទទួល
+        // 👥 Sender and recipient 
         $mail->setFrom('reaksakun93@gmail.com', 'Raksa Coffee Shop');
         $mail->addAddress($user_email, $user_name);               
 
         $mail->isHTML(true);
-        $mail->Subject = 'លេខកូដផ្ទៀងផ្ទាត់គណនីបុគ្គលិក - Raksa Coffee Shop';
+        $mail->Subject = 'Employee account verification code - Raksa Coffee Shop';
         
         $mail->Body    = "
             <div style='font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>

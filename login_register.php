@@ -3,7 +3,7 @@ session_start();
 require_once 'config.php';
 
 // ==========================================
-//   (REGISTER) - 🟢 ជួសជុលលំហូរកូដឱ្យត្រូវតាមស្តង់ដារសុវត្ថិភាព
+//   (REGISTER) - 🟢 Fix code flow to meet security standards
 // ==========================================
 if(isset($_POST['register'])){
     $username  = $conn->real_escape_string(trim($_POST['username']));
@@ -14,23 +14,23 @@ if(isset($_POST['register'])){
 
     $pwd = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    // 🔒 ជាន់ទី ១៖ ឆែកមើលថាតើ Staff ID នេះមានវត្តមានពិតប្រាកដក្នុងតារាង staff មេដែរឬទេ
+    // 🔒 Step 1: Check if this Staff ID actually exists in the main staff table.
     $checkStaffExist = $conn->query("SELECT staff_id FROM staff WHERE staff_id = '$staff_id'");
     
-    // 🔒 ជាន់ទី ២៖ ឆែកមើលថាតើ Staff ID នេះត្រូវបានគេយកទៅបង្កើត User ដែល "ផ្ទៀងផ្ទាត់រួចរាល់ (is_active=1)" ហើយឬនៅ
+    // 🔒 Step 2: Check if this Staff ID has been used to create a User that is "verified (is_active=1)" or not.
     $checkStaffUsed = $conn->query("SELECT user_id FROM users WHERE staff_id = '$staff_id' AND is_active = 1");
 
-    // 🔒 ជាន់ទី ៣៖ ឆែកមើល Username ឬ Email ជាន់គ្នាជាមួយគណនីដែល "សកម្ម (is_active=1)"
+    // 🔒 Step 3: Check for a username or email that matches an account that is "active (is_active=1)"
     $checkUser = $conn->query("SELECT user_id FROM users WHERE (username = '$username' OR email = '$email') AND is_active = 1");
 
     if($checkStaffExist->num_rows == 0) {
-        $_SESSION['register_error'] = 'លេខសម្គាល់បុគ្គលិក (Staff ID) នេះមិនត្រឹមត្រូវទេ!';
+        $_SESSION['register_error'] = 'This Staff ID is invalid!';
         $_SESSION['active_form'] = 'register';
         header("Location: index.php");
         exit();
     } 
     else if($checkStaffUsed->num_rows > 0) {
-        $_SESSION['register_error'] = 'Staff ID នេះត្រូវបានចុះឈ្មោះប្រើប្រាស់រួចរាល់ហើយ!';
+        $_SESSION['register_error'] = 'This Staff ID is ready to Sign Up!';
         $_SESSION['active_form'] = 'register';
         header("Location: index.php");
         exit();
@@ -42,10 +42,11 @@ if(isset($_POST['register'])){
         exit();
     } 
     else {
-        // 🟢 ប្រសិនបើឆ្លងកាត់ (ឬជាគណនីចាស់ដែលមិនទាន់ផ្ទៀងផ្ទាត់ is_active=0) គឺយើងលុបអាខោន unverified ចាស់នោះចោលសិន ការពារកុំឱ្យជាន់ Key
+        // 🟢 If it passes (or is an old account that has not been verified,
+        //  is_active=0), we will delete the old unverified account first to prevent the key from being overwritten.
         $conn->query("DELETE FROM users WHERE (staff_id = '$staff_id' OR email = '$email') AND is_active = 0");
 
-        // 🟢 កែសម្រួលលក្ខខណ្ឌឆែករូបភាពឱ្យកាន់តែហ្មត់ចត់
+        // 🟢 Adjust image checking conditions to be more thorough.
         $image_name = 'default_profile.png'; 
 
         if (isset($_FILES['image_staff']) && $_FILES['image_staff']['error'] === UPLOAD_ERR_OK) {
@@ -56,27 +57,27 @@ if(isset($_POST['register'])){
             move_uploaded_file($_FILES['image_staff']['tmp_name'], $target_path);
         }
 
-        // ហៅ File ជំនួយផ្ញើអ៊ីមែលដែលទើបដំឡើងជាមួយ Composer មិញ
+        // Composer 
         require_once 'mail_helper.php';
         
-        // បង្កើតលេខ random ៦ ខ្ទង់ និងម៉ោងផុតកំណត់ ១៥ នាទី
+        // Create the number to random 6 digit and time to 15 min
         $otp_code = rand(100000, 999999);
         $expire_time = date('Y-m-d H:i:s', strtotime('+15 minutes'));
         
-        // បញ្ជា Insert ចូល Database តែមួយគត់ (ដោយកំណត់លំនាំដើម is_active = 0 ដើម្បីរង់ចាំ OTP)
+        // Insert command into database only (by default is_active = 0 to wait for OTP)
         $sql = "INSERT INTO users (username, email, password_hash, role, staff_id, branch_id, image_staff, verification_code, code_expires_at, is_active) 
                 VALUES ('$username', '$email', '$pwd', '$role', '$staff_id', '$branch_id', '$image_name', '$otp_code', '$expire_time', 0)";
         
         if($conn->query($sql)){
             
-            // 💥 ហៅមុខងារ PHPMailer បាញ់អ៊ីមែលទៅកាន់បុគ្គលិកភ្លាមៗ
+            // 💥 Call the PHPMailer function to send emails to employees immediately.
             $is_sent = sendVerificationEmail($email, $username, $otp_code);
             
             if($is_sent) {
-                $_SESSION['verify_email'] = $email; // កត់ចំណាំទុកយកទៅឆែកនៅទំព័រ OTP
-                header("Location: verify_otp.php"); // រុញទៅផ្ទាំងវាយលេខ ៦ ខ្ទង់
+                $_SESSION['verify_email'] = $email; // Take note and check on the OTP page
+                header("Location: verify_otp.php"); // Scroll to the 6-digit number entry panel
             } else {
-                $_SESSION['register_error'] = 'ការចុះឈ្មោះជោគជ័យ តែប្រព័ន្ធមានបញ្ហាមិនអាចបាញ់អ៊ីមែល OTP ទៅកាន់ប្រអប់សំបុត្របានទេ !';
+                $_SESSION['register_error'] = 'Registration was successful, but the system had a problem and could not send the OTP email to the mailbox!';
                 $_SESSION['active_form'] = 'register';
                 //header("Location: index.php");
                 //exit();
@@ -91,7 +92,7 @@ if(isset($_POST['register'])){
 }
 
 // ==========================================
-// (LOGIN) - រក្សាទុកកូដចាស់ដើរធម្មតាត្រឹមត្រូវ
+// (LOGIN) Account
 // ==========================================
 if(isset($_POST['Login'])){
     $email = $conn->real_escape_string(trim($_POST['email']));
