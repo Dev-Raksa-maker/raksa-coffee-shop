@@ -260,8 +260,8 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
 
     <script>
         let cart = [];
-        let finalTotalGlobal = 0;  // ទុកបញ្ជូនទៅផ្ទាំង Pop-up
-        let subtotalGlobal = 0;    // 🟢 ដំណោះស្រាយ៖ បង្កើតអថេររួម (Global) ត្រង់នេះដើម្បីឱ្យគ្រប់ Function ទាំងអស់ស្គាល់វា
+        let finalTotalGlobal = 0;
+        let subtotalGlobal = 0;    
     
         // ១. មុខងារបន្ថែមទំនិញចូល Cart
         function addToCart(id, name, price) {
@@ -274,7 +274,7 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             renderCart();
         }
     
-        // ២. មុខងារបូក/ដកចំនួនទំនិញក្នុង Cart
+        // Add/subtract items from cart
         function updateQty(id, change) {
             let item = cart.find(p => p.id === id);
             if (item) {
@@ -286,7 +286,7 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             renderCart();
         }
     
-        // ៣. មុខងាររៀបចំ UI ក្នុងប្រអប់ Checkout ខាងស្តាំឡើងវិញ
+        // UI customization feature in Checkout box
         function renderCart() {
             const container = document.getElementById('cartContainer');
             if (cart.length === 0) {
@@ -320,14 +320,14 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             calculateTotals();
         }
     
-        // ៤. មុខងារគណនាលុយសរុប និង ភាគរយបញ្ចុះតម្លៃ
+        // Total money and discount percentage calculation function
         function calculateTotals() {
             let subtotal = 0;
             cart.forEach(item => {
                 subtotal += item.price * item.qty;
             });
             
-            subtotalGlobal = subtotal; // 🟢 ដំណោះស្រាយ៖ ញាត់តម្លៃផលបូកចូលទៅក្នុងអថេររួម
+            subtotalGlobal = subtotal; 
     
             let discountPercent = parseFloat(document.getElementById('discountInput').value) || 0;
             let discountAmount = subtotal * (discountPercent / 100);
@@ -338,7 +338,7 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             document.getElementById('totalOutput').innerText = `$${total.toFixed(2)}`;
         }
     
-        // ៥. មុខងារ Filter ផលិតផលតាមប្រភេទ (Category Tab Buttons)
+        // (Category Tab Buttons)
         function filterCategory(category, button) {
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
@@ -352,7 +352,7 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             });
         }
     
-        // ៦. មុខងារវាយ Search រកឈ្មោះផលិតផល Real-time
+        // Search the product Real-time
         document.getElementById('searchInput').addEventListener('input', function(e) {
             let keyword = e.target.value.toLowerCase().trim();
             document.querySelectorAll('.product-item').forEach(item => {
@@ -365,7 +365,7 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             });
         });
     
-        // ៧. មុខងារបើកផ្ទាំងលោតគិតលុយ (Modal Pop-up)
+        // (Modal Pop-up)
         let paymentModalObj;
         function processPayment() {
             if (cart.length === 0) {
@@ -380,7 +380,7 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             paymentModalObj.show();
         }
     
-        // ៨. មុខងារគណនាលុយអាប់ជូនភ្ញៀវ
+        // Guest payment calculation function
         function calculateChange() {
             let cash = parseFloat(document.getElementById('cashReceived').value) || 0;
             let change = cash - finalTotalGlobal;
@@ -399,19 +399,19 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             let qrContainer = document.getElementById('qrContainer');
         
             if (isQR) {
-                // ១. បើកប្រអប់ QR និង លាក់ប្រអប់វាយលុយសុទ្ធ
+                // Open QR box and close cash box
                 cashInputArea.style.display = 'none';
                 abaQrArea.style.display = 'block';
                 
-                // បំពេញតម្លៃលុយស្មើនឹងតម្លៃសរុបអូតូ
+                // Fill in the amount equal to the total amount.
                 cashInput.value = finalTotalGlobal.toFixed(2);
                 document.getElementById('modalChange').innerText = '$0.00';
         
-                // ២. ⚡ វគ្គសាហាវ៖ បាញ់ទៅហៅ QR Code ពី ABA មកបង្ហាញភ្លាមៗអូតូ
-                qrContainer.innerHTML = `<div class="text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i> កំពុងបង្កើត KHQR...</div>`;
+                // Shoot to call QR Code from ABA and it will show automatically.
+                qrContainer.innerHTML = `<div class="text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i> Creating KHQR...</div>`;
                 
                 let formData = new FormData();
-                formData.append('total_amount', finalTotalGlobal.toFixed(2)); // យកតម្លៃលុយពិតពីអថេររួម
+                formData.append('total_amount', finalTotalGlobal.toFixed(2)); // Get the real money value from the common variable.
                 formData.append('invoice_no', "INV-" + new Date().getTime());
         
                 fetch('generate_qr.php', {
@@ -421,7 +421,7 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // បង្ហាញរូបភាព QR Code ពិតដែលបានមកពីធនាគារ ABA
+                        // Show real image QR Code that give from ABA Bank
                         qrContainer.innerHTML = `<img src="${data.qr_image}" alt="ABA KHQR" style="width: 100%; max-width: 220px; border-radius: 12px;">`;
                     } else {
                         qrContainer.innerHTML = `<b class="text-danger">Error: ${data.message}</b>`;
@@ -429,11 +429,11 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    qrContainer.innerHTML = `<b class="text-danger">មិនអាចតភ្ជាប់ទៅកាន់ Server បានទេ!</b>`;
+                    qrContainer.innerHTML = `<b class="text-danger">Can not connect to server!</b>`;
                 });
         
             } else {
-                // បើបង់លុយសុទ្ធ ឱ្យបង្ហាញប្រអប់វាយលុយសុទ្ធ និងលាក់ប្រអប់ QR វិញ
+                // If paying in cash, show the cash box and hide the QR box.
                 cashInputArea.style.display = 'block';
                 abaQrArea.style.display = 'none';
                 
@@ -446,28 +446,26 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
         // ៩. មុខងារបញ្ចប់ការលក់ និង បាញ់ AJAX ទៅកាន់ PHP
         function submitOrder() {
             let cashReceived = parseFloat(document.getElementById('cashReceived').value) || 0;
-            
-            // ១. ផ្ទៀងផ្ទាត់លុយភ្ញៀវហុចឱ្យ
+        
             if (cashReceived < finalTotalGlobal) {
-                alert("លុយភ្ញៀវហុចឱ្យមិនគ្រប់គ្រាន់ទេ!");
+                alert("Cash received is not enough!");
                 return;
             }
         
-            // ២. ប្រមូលកញ្ចប់ទិន្នន័យដើម្បីផ្ញើទៅកាន់ PHP
-            // កែសម្រួល៖ ថែម cash_received និង cash_change ចូលទៅក្នុងកញ្ចប់ orderData
+            // cash_received and cash_change insert into orderData
             let orderData = {
                 subtotal: subtotalGlobal,
                 discount_amount: subtotalGlobal * ((parseFloat(document.getElementById('discountInput').value) || 0) / 100), 
                 grand_total: finalTotalGlobal,
                 payment_method: document.querySelector('input[name="payMethod"]:checked').value,
-                cash_received: cashReceived, // 🟢 ថែមបន្ទាត់នេះ (លុយភ្ញៀវហុចឱ្យ)
-                cash_change: parseFloat(document.getElementById('modalChange').innerText.replace('$', '')) || 0, // 🟢 ថែមបន្ទាត់នេះ (លុយអាប់ជូន)
+                cash_received: cashReceived, // Cash received
+                cash_change: parseFloat(document.getElementById('modalChange').innerText.replace('$', '')) || 0, // Cash change
                 customer_id: null, 
                 promo_id: null,    
                 cart: cart         
             };
         
-            // ៣. បាញ់ AJAX (Fetch) ទៅកាន់ Back-end
+            // AJAX (Fetch) to Back-end
             fetch('process_order.php', {
                 method: 'POST',
                 headers: {
@@ -478,58 +476,58 @@ $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available 
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert("🎉 ការលក់ជោគជ័យ! លេខវិក្កយបត្រ៖ #" + data.order_id);
+                    alert("🎉 Saling successfully! No. invoice៖ #" + data.order_id);
                     
-                    // សម្អាតកន្ត្រកទិញ និងបិទ Pop-up គិតលុយ
+                    // Clear sale box and close exchange Pop-up
                     cart = [];
                     renderCart();
                     paymentModalObj.hide();
                 } else {
-                    alert("❌ មានបញ្ហា៖ " + data.message);
+                    alert("❌ Have a problem: " + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("❌ មិនអាចទាក់ទងទៅកាន់ Server បានទេ!");
+                alert("❌ Can not connect to server!");
             });
         }
 
         document.getElementById('btn-khqr').addEventListener('click', function() {
             let btn = this;
 
-            // 💡 ល្បិច Pro៖ ទៅចាប់យកតម្លៃលុយសរុបពិតៗពីអេក្រង់ Checkout (ឧទាហរណ៍ពី Element ដែលមានស្រាប់)
-            // ប្រូត្រូវផ្ទៀងផ្ទាត់មើលថា តម្លៃលុយសរុបក្នុងកន្ត្រករបស់ប្រូដេកក្នុង ID ឈ្មោះអី (ឧទាហរណ៍៖ id="total-price")
+            // Get the actual total from the Checkout screen
+            // Verify that the total in the cart is the product ID name.
             let realAmount = document.getElementById('total-price').innerText; 
-            let invoiceNo = "INV-" + new Date().getTime(); // បង្កើតលេខវិក្កយបត្រតាមពេលវេលាពិត
+            let invoiceNo = "INV-" + new Date().getTime(); // Create No. invoice
 
-            btn.innerText = "កំពុងបង្កើត QR...";
+            btn.innerText = "Creating QR...";
             btn.disabled = true;
 
-            // វេចខ្ចប់ទិន្នន័យពិតញាត់ចូលក្នុង FormData
+            // Pack the real data in FormData
             let formData = new FormData();
             formData.append('total_amount', realAmount);
             formData.append('invoice_no', invoiceNo);
 
-            // បាញ់កញ្ចប់ទិន្នន័យពិតនេះទៅកាន់ Backend
+            // Shoot this real data packet to Backend
             fetch('generate_qr.php', {
-                method: 'POST', // ប្តូរមកប្រើ POST ដើម្បីបញ្ជូនទិន្នន័យ
+                method: 'POST', 
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                btn.innerText = "គិតលុយតាម ABA KHQR";
+                btn.innerText = "Charge according to ABA KHQR";
                 btn.disabled = false;
 
                 if (data.status === 'success') {
                     document.getElementById('qr-modal-container').style.display = 'block';
                     document.getElementById('qr-image-area').innerHTML = `<img src="${data.qr_image}" style="width: 100%;">`;
-                    document.getElementById('qr-amount').innerText = data.amount; // បង្ហាញតម្លៃពិតលើ UI
+                    document.getElementById('qr-amount').innerText = data.amount; // Show the real value to UI
                 } else {
                     alert("Error: " + data.message);
                 }
             })
             .catch(error => {
-                btn.innerText = "គិតលុយតាម ABA KHQR";
+                btn.innerText = "Charge according to ABA KHQR";
                 btn.disabled = false;
                 console.error('Error:', error);
             });
