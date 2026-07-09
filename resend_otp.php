@@ -13,20 +13,19 @@ $email = $_SESSION['verify_email'];
 $new_otp = rand(100000, 999999);
 $new_expire = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
-// Update ចូលទៅជំនួសកូដចាស់ក្នុង Database
+// Update to replace old code in Database
 $update = $conn->query("UPDATE users SET verification_code = '$new_otp', code_expires_at = '$new_expire' WHERE email = '$email' AND is_active = 0");
 
 if ($update) {
-    // ទាញយកឈ្មោះយូសឺរមកដើម្បីផ្ញើអ៊ីមែល
+    // Download username to send email
     $user_query = $conn->query("SELECT username FROM users WHERE email = '$email'");
     $user = $user_query->fetch_assoc();
     
-    // 💥 បាញ់អ៊ីមែលកូដថ្មីទៅភ្លាមៗ
     sendVerificationEmail($email, $user['username'], $new_otp);
     
-    $_SESSION['resend_success'] = "✅ បានផ្ញើលេខកូដ OTP ថ្មីទៅកាន់អ៊ីមែលរបស់អ្នករួចរាល់ហើយ!";
+    $_SESSION['resend_success'] = "✅ A new OTP code has been sent to your email.!";
 } else {
-    $_SESSION['resend_error'] = "មានបញ្ហាក្នុងការផ្ញើលេខកូដឡើងវិញ!";
+    $_SESSION['resend_error'] = "There was a problem resending the code.!";
 }
 
 header("Location: verify_otp.php");

@@ -8,7 +8,6 @@ if(!isset($_SESSION['user_id'])){
     exit();
 }
 
-// ២. ទាញយកទិន្នន័យដោយភ្ជាប់តារាង users និង staff បញ្ចូលគ្នា (JOIN)
 $user_id = $_SESSION['user_id'];
 $sql = "SELECT u.email, u.image_staff, u.branch_id, s.full_name, s.position, s.phone 
         FROM users u 
@@ -18,7 +17,6 @@ $sql = "SELECT u.email, u.image_staff, u.branch_id, s.full_name, s.position, s.p
 $result = mysqli_query($conn, $sql);
 $profile = mysqli_fetch_assoc($result);
 
-// ៣. រៀបចំទិន្នន័យ (បើអត់មានទិន្នន័យ ឱ្យវាលោតពាក្យ N/A)
 $email     = $profile['email'] ?? 'N/A';
 $full_name = $profile['full_name'] ?? 'N/A';
 $position  = $profile['position'] ?? 'N/A';

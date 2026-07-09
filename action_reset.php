@@ -2,34 +2,29 @@
 session_start();
 require_once 'config.php';
 
-// ១. ការពារមិនឱ្យអ្នកអត់ Login ចូលមកបាន
 if(!isset($_SESSION['user_id'])){
     header("Location: index.php");
     exit();
 }
 
-// ២. ចាប់យក id និង email ដែលបោះមកពីទំព័រ Admin Dashboard តាមរយៈ URL (GET)
 $notif_id = $_GET['id'] ?? '';
 $user_email = $_GET['email'] ?? '';
 
-// ៣. ពេល Admin ចុចប៊ូតុង SAVE (បញ្ជូនទិន្នន័យមកតាម POST)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $email_to_update = $conn->real_escape_string($_POST['email']);
     $id_to_update    = $conn->real_escape_string($_POST['notif_id']);
     
-    // បំប្លែងលេខសម្ងាត់ថ្មីទៅជាកូដសម្ងាត់ (Hash)
+    //(Hash)
     $new_pwd = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
 
-    // ធ្វើការ Update លេខសម្ងាត់ថ្មីចូលក្នុងតារាង users
     $update_user = "UPDATE users SET password_hash = '$new_pwd' WHERE email = '$email_to_update'";
     
     if ($conn->query($update_user) === TRUE) {
-        // បើកែ Password ជោគជ័យ ត្រូវទៅប្តូរស្ថានភាពសារពី unread ទៅ read វិញ
+        // If the password change is successful, you must change the message status from unread to read.
         $update_notif = "UPDATE notifications SET status = 'read' WHERE id = '$id_to_update'";
         $conn->query($update_notif);
 
-        // បញ្ជូនត្រលប់ទៅ Dashboard វិញ
         header("Location: admin_dashboard.php");
         exit();
     }

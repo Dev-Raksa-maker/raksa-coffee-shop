@@ -10,25 +10,25 @@ if(!isset($_SESSION['user_id']) || !isset($_SESSION['current_shift_id'])){
 $user_id  = $_SESSION['user_id'];
 $shift_id = $_SESSION['current_shift_id'];
 
-// ២. ទាញយកព័ត៌មាន Email របស់ Cashier ដែលកំពុង Login ពិតប្រាកដ
+// Retrieve the email information of the actual Cashier who is currently logging in.
 $query_user = mysqli_query($conn, "SELECT email FROM users WHERE user_id = '$user_id'");
 $user_info  = mysqli_fetch_assoc($query_user);
 $email      = $user_info['email'] ?? 'no-email@bakery.com';
 
-// ៣. វគ្គគោះទិន្នន័យបិទ Shift ចូល Database ពេលចុចប៊ូតុង SAVE
+// Press Shift to enter the database when pressing the SAVE button.
 $error_msg = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['close_shift_btn'])) {
     
     $actual_cash = floatval($_POST['actual_cash']);
-    $end_time    = date('H:i:s'); // ទម្រង់ ២៤ម៉ោងសម្រាប់ញាត់ចូល Database
+    $end_time    = date('H:i:s'); // form 24h
 
-    // រូបមន្ត UPDATE ប្តូរស្ថានភាព shift ទៅជាបិទ (status = 0)
+    // UPDATE Change shift status to closed (status = 0)
     $sql_close = "UPDATE shifts 
                   SET end_time = '$end_time', actual_cash = '$actual_cash', status = 0 
                   WHERE shift_id = '$shift_id' AND user_id = '$user_id'";
 
     if (mysqli_query($conn, $sql_close)) {
-        // ជោគជ័យ៖ សម្អាតកូនសោរ Shift ចេញពី Session ដើម្បីឱ្យគាត់អាចបើក Shift ថ្មីនៅថ្ងៃក្រោយបាន
+        // Clear the Shift key from the session so that he can open a new Shift the next day.
         unset($_SESSION['current_shift_id']);
 
         header("Location: index.php");
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['close_shift_btn'])) {
     }
 }
 
-// ម៉ោងជាក់ស្តែងសម្រាប់បង្ហាញនៅលើអេក្រង់ UI (ទម្រង់ AM/PM)
+// Actual time to display on UI screen (AM/PM format)
 $current_time = date('h:i A'); 
 ?>
 

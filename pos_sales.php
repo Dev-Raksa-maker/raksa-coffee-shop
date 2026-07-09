@@ -2,10 +2,6 @@
 session_start();
 require_once 'config.php';
 
-// កំណត់តំបន់ម៉ោងស្រុកខ្មែរឱ្យត្រឹមត្រូវ ១០០%
-date_default_timezone_set('Asia/Phnom_Penh');
-
-// ១. ការពារមិនឱ្យអ្នកអត់ Login ចូលមកបាន
 if(!isset($_SESSION['user_id'])){
     header("Location: index.php");
     exit();

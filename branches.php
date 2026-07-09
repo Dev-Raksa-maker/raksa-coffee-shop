@@ -31,14 +31,14 @@ $sql_branches = "
 ";
 $branches_query = mysqli_query($conn, $sql_branches);
 
-// ចាប់យកលីងផែនទីសាខាដំបូងគេបង្អស់ ដើម្បីធ្វើជាតម្លៃលំនាំដើមពេលបើកទំព័រដំបូង (Default Map)
+// (Default Map)
 $default_map = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3908.7706798031355!2d104.8872439!3d11.5675841!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13m3!1m2!1s0x3109519fe4616285%3A0x231ff616db6ee777!2sNational%20Technical%20Training%20Institute!5e0!3m2!1sen!2skh!4v1700000000000"; 
 $branches_list = [];
 while($row = mysqli_fetch_assoc($branches_query)) {
     $branches_list[] = $row;
 }
 if (!empty($branches_list)) {
-    // បើមានទិន្នន័យក្នុង DB គឺយកលីងពី Column location របស់សាខាចុងក្រោយគេមកបង្ហាញមុនគេ
+    // If there is data in the DB, the link from the Column location of the last branch is displayed first.
     $default_map = !empty($branches_list[0]['location']) ? $branches_list[0]['location'] : $default_map;
 }
 ?>

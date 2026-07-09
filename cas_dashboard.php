@@ -16,7 +16,6 @@ $category_map = [
     6 => 'snacks',
 ];
 
-// ២. សរសេរ SQL Query ទាញយកតែផលិតផលណាដែលបើកលក់ (is_available = 1) 
 $product_query = mysqli_query($conn, "SELECT * FROM products WHERE is_available = 1 ORDER BY product_id ASC");
 ?>
 

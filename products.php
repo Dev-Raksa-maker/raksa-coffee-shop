@@ -7,7 +7,7 @@
         exit();
     }
 
-    // ទាញយកទិន្នន័យ Products មកបង្ហាញដោយ JOIN ជាមួយ Categories
+    // Download Products data and display it by JOIN with Categories
     $sql = "SELECT p.*, c.category_name 
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.category_id
@@ -275,19 +275,18 @@
         const cancelBtn = document.getElementById('cancelBtn');
     
         form.addEventListener('submit', function (event) {
-            // បើបំពេញព័ត៌មានមិនទាន់គ្រប់គ្រាន់ ឬអត់ទាន់បានរើសរូបថត
             if (!form.checkValidity()) {
                 event.preventDefault(); 
                 event.stopPropagation();
             } else {
-                // បើបំពេញត្រឹមត្រូវ និងមានរូបថតគ្រប់គ្រាន់ហើយ
-                event.preventDefault(); // ទប់ទំព័រកុំឱ្យទើប Refresh ភ្លាមៗ
                 
-                // លោតបង្ហាញសារ Toast ជោគជ័យ
+                event.preventDefault(); // Prevent the page from refreshing immediately.
+                
+                // Jump to show a success toast message
                 const toast = new bootstrap.Toast(toastLiveExample);
                 toast.show();
                 
-                // ទុកពេល ១.៥ វិនាទីឱ្យ User មើល Toast រួចទើបបាញ់ទិន្នន័យទៅ PHP
+                // Allow 1.5 seconds for the user to view the Toast before sending the data to PHP.
                 setTimeout(function() {
                     form.submit();
                 }, 1500);

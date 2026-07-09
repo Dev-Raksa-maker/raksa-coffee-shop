@@ -102,7 +102,6 @@ $order_query = mysqli_query($conn, "SELECT * FROM orders WHERE user_id = '$curre
                             </thead>
                             <tbody>
                                 <?php 
-                                    // 🟢 ២. ដំណើរការ Loop ទាញទិន្នន័យពី Database មកបង្ហាញលើ UI
                                     if(mysqli_num_rows($order_query) > 0) {
                                         while($row = mysqli_fetch_assoc($order_query)) {
                                 ?>
@@ -133,8 +132,9 @@ $order_query = mysqli_query($conn, "SELECT * FROM orders WHERE user_id = '$curre
                                 <?php
                                         }
                                     } else {
-                                        // ករណីបុគ្គលិកហ្នឹងទើបតែចូលធ្វើការ មិនទាន់លក់បានវិក្កយបត្រណាមួយសោះ
-                                        echo '<tr><td colspan="8" class="text-center text-muted py-5"><i class="fa-solid fa-folder-open d-block fs-2 mb-2 text-light"></i>មិនទាន់មានប្រវត្តិលក់សម្រាប់គណនីនេះទេ!</td></tr>';
+                                        echo '<tr><td colspan="8" class="text-center text-muted py-5">
+                                        <i class="fa-solid fa-folder-open d-block fs-2 mb-2 text-light">
+                                        </i>There is no sales history for this account.!</td></tr>';
                                     }
                                 ?>
                             </tbody>

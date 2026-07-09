@@ -12,50 +12,48 @@ $success_msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    // ចាប់យកទិន្នន័យពី Form និងសម្អាតកូដបន្លំជើងក្អែក
     $branch_name = mysqli_real_escape_string($conn, trim($_POST['branch_name']));
     $location    = mysqli_real_escape_string($conn, trim($_POST['location']));
     $phone       = mysqli_real_escape_string($conn, trim($_POST['phone']));
     $manager_id  = trim($_POST['manager_id']);
 
-    // 🟢 Fix Syntax: លុបសញ្ញា "::" ចេញ ទុកត្រឹម empty($manager_id) ធម្មតា
     if (empty($branch_name) || empty($location) || empty($phone) || empty($manager_id)) {
         $error_msg = "Please input the branch detail!";
     } else {
         
-        // ពិនិត្យមើលថាតើ Manager ID ដែលវាយបញ្ចូល មានដេកចាំនៅក្នុងតារាង users (User ID) ពិតមែនអត់
+        // Check whether the entered Manager ID is actually stored in the users (User ID) table.
         $manager_id_clean = mysqli_real_escape_string($conn, $manager_id);
         $check_manager = mysqli_query($conn, "SELECT user_id FROM users WHERE user_id = '$manager_id_clean' AND is_active = 1");
         
         if (mysqli_num_rows($check_manager) == 0) {
-            // ❌ បើរកមិនឃើញ ID នេះនៅក្នុងតារាង users ទេ គឺបដិសេធភ្លាម
+            //If this ID is not found in the users table, it is rejected immediately.
             $error_msg = "Manager ID (User ID: $manager_id) This is incorrect or there is no account in the system.!";
         } else {
             
-            //  Upload រូបភាពហាងកាហ្វេចូល Folder: image_shop/
+            //  Upload the image shop Folder: image_shop/
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 
                 $file_name = $_FILES['image']['name'];
                 $file_tmp  = $_FILES['image']['tmp_name'];
                 
-                // ថែមម៉ោង time() ពីមុខឈ្មោះឯកសារ ដើម្បីកុំឱ្យជាន់ឈ្មោះគ្នាពេល Upload
+                // Add time() before the file name to avoid overlapping names when uploading.
                 $new_image_name = time() . '_' . $file_name;
                 $target_folder  = "image_shop/" . $new_image_name;
 
-                // ពិនិត្យមើលបើគ្មាន Folder image_shop មែន គឺបង្កើតឱ្យអូតូ
+                // Check if there is no folder image_shop, it will be created automatically.
                 if (!is_dir('image_shop')) {
                     mkdir('image_shop', 0777, true);
                 }
 
                 if (move_uploaded_file($file_tmp, $target_folder)) {
                     
-                    // ឆ្លងកាត់លក្ខខណ្ឌគ្រប់គ្រាន់ទាំងអស់ ➔ ធ្វើការ INSERT ចូល Database !
+                    // Pass all the conditions ➔ INSERT into the Database!
                     $sql_insert = "INSERT INTO branches (branch_name, location, phone, manager_id, img_shop, is_open) 
                                    VALUES ('$branch_name', '$location', '$phone', '$manager_id_clean', '$new_image_name', 1)";
                     
                     if (mysqli_query($conn, $sql_insert)) {
                         $success_msg = "Created a new branch was successfully! 🎉";
-                        // រុញត្រលប់ទៅទំព័របញ្ជីសាខាវិញ ក្រោយពេលរក្សាទុកជោគជ័យរយៈពេល ១.៥ វិនាទី
+                        // Push back to branch list page after successful save for 1.5 seconds
                         header("refresh:1.5; url=branches.php");
                     } else {
                         $error_msg = "មានបញ្ហាខាងកូដ SQL បុកចូល Database: " . mysqli_error($conn);

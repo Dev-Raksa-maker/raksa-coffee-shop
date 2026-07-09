@@ -3,7 +3,7 @@ session_start();
 require_once 'config.php';
 
 // ==========================================
-//   (REGISTER) - 🟢 Fix code flow to meet security standards
+//   (REGISTER) - Fix code flow to meet security standards
 // ==========================================
 if(isset($_POST['register'])){
     $username  = $conn->real_escape_string(trim($_POST['username']));
@@ -14,13 +14,13 @@ if(isset($_POST['register'])){
 
     $pwd = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    // 🔒 Step 1: Check if this Staff ID actually exists in the main staff table.
+    // Step 1: Check if this Staff ID actually exists in the main staff table.
     $checkStaffExist = $conn->query("SELECT staff_id FROM staff WHERE staff_id = '$staff_id'");
     
-    // 🔒 Step 2: Check if this Staff ID has been used to create a User that is "verified (is_active=1)" or not.
+    // Step 2: Check if this Staff ID has been used to create a User that is "verified (is_active=1)" or not.
     $checkStaffUsed = $conn->query("SELECT user_id FROM users WHERE staff_id = '$staff_id' AND is_active = 1");
 
-    // 🔒 Step 3: Check for a username or email that matches an account that is "active (is_active=1)"
+    // Step 3: Check for a username or email that matches an account that is "active (is_active=1)"
     $checkUser = $conn->query("SELECT user_id FROM users WHERE (username = '$username' OR email = '$email') AND is_active = 1");
 
     if($checkStaffExist->num_rows == 0) {
@@ -42,11 +42,11 @@ if(isset($_POST['register'])){
         exit();
     } 
     else {
-        // 🟢 If it passes (or is an old account that has not been verified,
+        // If it passes (or is an old account that has not been verified,
         //  is_active=0), we will delete the old unverified account first to prevent the key from being overwritten.
         $conn->query("DELETE FROM users WHERE (staff_id = '$staff_id' OR email = '$email') AND is_active = 0");
 
-        // 🟢 Adjust image checking conditions to be more thorough.
+        // Adjust image checking conditions to be more thorough.
         $image_name = 'default_profile.png'; 
 
         if (isset($_FILES['image_staff']) && $_FILES['image_staff']['error'] === UPLOAD_ERR_OK) {
@@ -70,7 +70,7 @@ if(isset($_POST['register'])){
         
         if($conn->query($sql)){
             
-            // 💥 Call the PHPMailer function to send emails to employees immediately.
+            // Call the PHPMailer function to send emails to employees immediately.
             $is_sent = sendVerificationEmail($email, $username, $otp_code);
             
             if($is_sent) {

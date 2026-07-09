@@ -1,7 +1,3 @@
-<?php
-    
-    
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -86,18 +82,18 @@
     
         form.addEventListener('submit', function (event) {
             if (!form.checkValidity()) {
-                // បើវាយអត់ទាន់គ្រប់ មិនឱ្យបញ្ជូនទិន្នន័យទេ
+                // If you don't type enough, the data will not be sent.
                 event.preventDefault(); 
                 event.stopPropagation();
             } else {
-                // បើវាយត្រូវអស់ហើយ
-                event.preventDefault(); // ទប់សិន កុំឱ្យ Page លោតទៅបាត់
                 
-                // លោត Toast បង្ហាញភាពជោគជ័យ
+                event.preventDefault(); 
+                
+                // Toast shows success
                 const toast = new bootstrap.Toast(toastLiveExample);
                 toast.show();
 
-                // ពន្យារពេល ១.៥ វិនាទី ទើបបញ្ជូនទិន្នន័យទៅ PHP ដើម្បីឱ្យ User មើល Toast ទាន់
+                // Delay 1.5 seconds before sending data to PHP so that the user can see the Toast in time
                 setTimeout(function() {
                     form.submit(); 
                 }, 1500);
@@ -105,7 +101,7 @@
             form.classList.add('was-validated'); 
         }, false);
 
-        // ពេលចុច Cancel លុបពណ៌ក្រហមចាប់កំហុសចេញ
+        // When you click Cancel, the red line that identifies the error is removed.
         cancelBtn.addEventListener('click', function () {
             form.classList.remove('was-validated');
         });

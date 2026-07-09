@@ -136,11 +136,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
         form.addEventListener('submit', function (event) {
             
-            // ឆែកមើលថាតើប្រអប់លេខថ្មី និងប្រអប់បញ្ជាក់ វាយដូចគ្នាអត់?
             if (newPassword.value !== confirmPassword.value) {
                 confirmPassword.setCustomValidity("Passwords do not match");
             } else {
-                confirmPassword.setCustomValidity(""); // បើដូចគ្នា លុបការហាមឃាត់ចេញ
+                confirmPassword.setCustomValidity(""); 
             }
 
             if (!form.checkValidity()) {

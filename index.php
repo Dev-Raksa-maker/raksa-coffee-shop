@@ -6,7 +6,7 @@ $error = [
     'register' => $_SESSION['register_error'] ?? ''
 ];
 
-// 🟢 ថែម៖ ចាប់យកសារចុះឈ្មោះជោគជ័យ
+// Capture successful registration message
 $register_success = $_SESSION['register_success'] ?? '';
 
 $activeForm = $_SESSION['active_form'] ?? 'login';
@@ -17,7 +17,7 @@ function showError($error){
     return !empty($error) ? "<p class=\"error-message\" style=\"color:red; background:#ffe6e6; padding:8px; border-radius:5px;\">$error</p>" : '';
 }
 
-// 🟢 ថែម៖ អនុគមន៍បង្ហាញសារពណ៌បៃតងពេល Sign Up ជោគជ័យ
+// Show a green message when Sign Up is successful.
 function showSuccess($success){
     return !empty($success) ? "<p class=\"success-message\" style=\"color:green; background:#e6ffe6; padding:8px; border-radius:5px;\">$success</p>" : '';
 }

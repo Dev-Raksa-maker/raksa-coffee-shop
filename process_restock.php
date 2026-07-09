@@ -14,7 +14,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $qty         = floatval($_POST['qty']);
     $unit_price  = floatval($_POST['unit_price']);
     
-    // គណនាតម្លៃសរុបប្រចាំជួរ (line_total) និង តម្លៃសរុបវិក្កយបត្រ (total_amount)
     $line_total   = $qty * $unit_price;
     $total_amount = $line_total; 
 
@@ -23,17 +22,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // ២. បញ្ចូលទិន្នន័យចូលតារាងធំ: purchase_orders 
-    // កំណត់ status = 'Completed' និង branch_id = 1 ជាតម្លៃលំនាំដើម
+    // purchase_orders 
     $sql_order = "INSERT INTO purchase_orders (order_date, total_amount, status, supplier_id, branch_id) 
                   VALUES (NOW(), '$total_amount', 'Completed', '$supplier_id', 1)";
     
     if ($conn->query($sql_order) === TRUE) {
         
-        // ចាប់យក po_id ដែលទើបនឹងលោតបង្កើតឡើងហ្វ្រេសៗ
         $po_id = $conn->insert_id;
 
-        // ៣. បញ្ចូលទិន្នន័យចូលតារាងលម្អិត: purchase_order_details
+        // purchase_order_details
         $sql_details = "INSERT INTO purchase_order_details (qty, unit_price, line_total, po_id, item_id) 
                         VALUES ('$qty', '$unit_price', '$line_total', '$po_id', '$item_id')";
         

@@ -2,7 +2,7 @@
 session_start();
 include 'config.php' ;
 
-// ១. ប្រព័ន្ធសុវត្ថិភាព៖ ឆែកមើលបើមិនទាន់ Login ឱ្យដេញចេញទៅទំព័រ index.php ភ្លាម
+// Security system: Check if you are not logged in and immediately go to the index.php page.
 if(!isset($_SESSION['user_id'])){
     header("Location: index.php");
     exit();
@@ -11,16 +11,16 @@ if(!isset($_SESSION['user_id'])){
 $current_user_id = $_SESSION['user_id'];
 
 // ========================================================
-// វគ្គគណនាទិន្នន័យចំណូល និង ចំណាយប្រចាំខែទាំង ១២ តាមឆ្នាំដែលបានរើស
+// Calculate monthly income and expense data for the 12 selected years.
 // ========================================================
 
 $revenue_by_months = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 $expense_by_months = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-//  ចាប់យកឆ្នាំដែល Admin ចុចរើសតាមលីង URL (បើអត់មានចុចរើសទេ ឱ្យយកឆ្នាំបច្ចុប្បន្នអូតូ)
+// Capture the year that the Admin clicked to select from the URL link (if there is no click to select, the current year will be automatically taken).
 $selected_year = isset($_GET['year']) ? intval($_GET['year']) : intval(date('Y'));
 
-// ១. ទាញផលបូកចំណូល ដោយដូរមកប្រើអថេរ $selected_year វិញ
+// Pull the income sum
 $chart_rev_query = mysqli_query($conn, "SELECT MONTH(order_date) AS month_num, SUM(grand_total) AS total FROM orders WHERE YEAR(order_date) = '$selected_year' GROUP BY MONTH(order_date)");
 if($chart_rev_query) {
     while($row = mysqli_fetch_assoc($chart_rev_query)) {
@@ -28,8 +28,7 @@ if($chart_rev_query) {
         $revenue_by_months[$month_index] = floatval($row['total']);
     }
 }
-
-// ២. ស្កែនផលបូកការចំណាយ ដោយដូរមកប្រើអថេរ $selected_year វិញ
+// Real-time in this year
 $chart_exp_query = mysqli_query($conn, "SELECT MONTH(order_date) AS month_num, SUM(total_amount) AS total FROM purchase_orders WHERE YEAR(order_date) = '$selected_year' GROUP BY MONTH(order_date)");
 if($chart_exp_query) {
     while($row = mysqli_fetch_assoc($chart_exp_query)) {
@@ -38,7 +37,7 @@ if($chart_exp_query) {
     }
 }
 
-// ២. ទាញទិន្នន័យបុគ្គលិកមកបង្ហាញក្នុងតារាង Staff
+// Table Staff
 $sql = "SELECT * FROM staff ORDER BY staff_id ASC";
 $result = mysqli_query($conn, $sql);
 
@@ -52,31 +51,31 @@ $notes_query = mysqli_query($conn, "SELECT * FROM notifications WHERE status = '
 
 
 // ========================================================
-// 🟢 វគ្គគណនាទិន្នន័យលុយកាក់ និងស្ថិតិលក់ (DYNAMIC METRICS)
+//  (DYNAMIC METRICS)
 // ========================================================
 
-// ក. គណនាចំណូលសរុប (Total Revenue) ពី Table orders
+// (Total Revenue) from Table orders
 $query_rev = mysqli_query($conn, "SELECT SUM(grand_total) AS total_revenue FROM orders");
 $row_rev = mysqli_fetch_assoc($query_rev);
 $total_revenue = $row_rev['total_revenue'] ?? 0.00;
 
-// ខ. រាប់ចំនួនសមាជិកភ្ញៀវសរុប (Active Customers) ពី Table customers
+// (Active Customers) from Table customers
 $query_cust = mysqli_query($conn, "SELECT COUNT(customer_id) AS total_cust FROM customers");
 $row_cust = mysqli_fetch_assoc($query_cust);
 $total_customers = $row_cust['total_cust'] ?? 0;
 
-// គ. រាប់ចំនួនវិក្កយបត្រលក់សរុប (Total Orders)
+// (Total Orders)
 $query_ord_count = mysqli_query($conn, "SELECT COUNT(order_id) AS total_orders FROM orders");
 $row_ord_count = mysqli_fetch_assoc($query_ord_count);
 $total_orders = $row_ord_count['total_orders'] ?? 0;
 
-// ឃ. គណនាចំណូលប្រចាំថ្ងៃនេះផ្ទាល់ (Today's Sales)
+// (Today's Sales)
 $today_date = date('Y-m-d');
 $query_today = mysqli_query($conn, "SELECT SUM(grand_total) AS today_revenue FROM orders WHERE DATE(order_date) = '$today_date'");
 $row_today = mysqli_fetch_assoc($query_today);
 $today_revenue = $row_today['today_revenue'] ?? 0.00;
 
-// ង. ទាញយកប្រវត្តិនៃការលក់ ៥ ជួរចុងក្រោយបង្អស់ 
+// Download the last 5 rows of sales history
 $recent_orders = mysqli_query($conn, "SELECT * FROM orders ORDER BY order_id DESC LIMIT 5");
 ?>
 

@@ -12,11 +12,10 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['current_shift_id'])) {
 $inputData = json_decode(file_get_contents('php://input'), true);
 
 if (!$inputData || empty($inputData['cart'])) {
-    echo json_encode(['status' => 'error', 'message' => 'កន្ត្រកទំនិញទទេស្អាត bro!']);
+    echo json_encode(['status' => 'error', 'message' => 'Empty shopping cart!']);
     exit();
 }
 
-// ចាប់បំបែកអថេរ
 $user_id         = $_SESSION['user_id'];
 $shift_id        = $_SESSION['current_shift_id'];
 $order_date      = date('Y-m-d H:i:s');
@@ -33,7 +32,6 @@ $cart            = $inputData['cart'];
 $conn->begin_transaction();
 
 try {
-    // ១. INSERT ចូលតារាង orders 
     $stmtOrder = $conn->prepare("INSERT INTO orders (order_date, subtotal, discount_amount, grand_total, cash_received, cash_change, payment_method, status, shift_id, user_id, customer_id, promo_id) VALUES (?, ?, ?, ?, ?, ?, ?, 'Paid', ?, ?, ?, ?)");
     
     if (!$stmtOrder) {
@@ -45,7 +43,6 @@ try {
     
     $order_id = $conn->insert_id;
 
-    // ២. INSERT ចូលតារាង order_details (លុប Logic កាត់ស្តុកគ្រឿងផ្សំចេញហើយ)
     $stmtDetail = $conn->prepare("INSERT INTO order_details (qty, unit_price, line_total, order_id, product_id) VALUES (?, ?, ?, ?, ?)");
     
     if (!$stmtDetail) {
@@ -62,7 +59,6 @@ try {
         $stmtDetail->execute();
     }
 
-    // ៣. INSERT ចូលតារាង payments
     $stmtPayment = $conn->prepare("INSERT INTO payments (payment_method, amount_paid, payment_date, order_id) VALUES (?, ?, ?, ?)");
     
     if (!$stmtPayment) {
@@ -72,7 +68,7 @@ try {
     $stmtPayment->bind_param("sdsi", $payment_method, $grand_total, $order_date, $order_id);
     $stmtPayment->execute();
 
-    // ៤. Update លុយរំពឹងទុកក្នុង Shifts
+    // Update expected cash in Shifts
     if ($payment_method === 'QR') {
         $updateShiftSql = "UPDATE shifts SET expected_qr = IFNULL(expected_qr, 0) + $grand_total WHERE shift_id = $shift_id";
     } else {
@@ -92,7 +88,7 @@ try {
 
 } catch (Exception $e) {
     $conn->rollback();
-    echo json_encode(['status' => 'error', 'message' => 'រក្សាទុកបរាជ័យ៖ ' . $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => 'Save failed: ' . $e->getMessage()]);
     exit();
 }
 ?>

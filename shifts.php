@@ -65,7 +65,6 @@
                                                 echo '<td class="fw-bold text-dark">' . $row['user_id'] . '</td>';
                                                 echo '<td>' . date('d-M-Y', strtotime($row['shift_date'])) . '</td>';
 
-                                                // បង្ហាញ Start Time ជាទម្រង់ AM / PM
                                                 echo '<td><span class="badge bg-light text-dark border">' . date('h:i A', strtotime($row['start_time'])) . '</span></td>';
 
                                                 if($row['end_time'] != null){
@@ -82,7 +81,6 @@
                                                     echo '<td class="text-muted">—</td>';
                                                 }
 
-                                                // 🟢 ថែម៖ បង្ហាញទិន្នន័យលុយបាញ់ QRcode (ពណ៌ខៀវ text-info)
                                                 if(isset($row['expected_qr']) && $row['expected_qr'] !== null){
                                                     echo '<td class="fw-bold text-info">$' . number_format($row['expected_qr'], 2) . '</td>';
                                                 } else {

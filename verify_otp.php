@@ -2,7 +2,6 @@
 session_start();
 include 'config.php';
 
-// 🔒 ប្រព័ន្ធការពារ៖ ឆែកមើលបើគ្មាន Email ដេកចាំក្នុង Session ទេ ឱ្យដេញត្រលប់ទៅទំព័រដើមវិញភ្លាម
 if (!isset($_SESSION['verify_email'])) {
     header("Location: index.php");
     exit();
@@ -10,48 +9,47 @@ if (!isset($_SESSION['verify_email'])) {
 
 $email = $_SESSION['verify_email'];
 $error_msg = '';
-$success_msg = $_SESSION['resend_success'] ?? ''; // ចាប់យកសារផ្ញើឡើងវិញជោគជ័យ
+$success_msg = $_SESSION['resend_success'] ?? ''; 
 unset($_SESSION['resend_success']);
 
-// ចាប់យកលេខកូដមកផ្ទៀងផ្ទាត់នៅពេល User ចុចប៊ូតុង Submit
+// Capture the code to verify when the user clicks the Submit button.
 if (isset($_POST['verify_otp'])) {
     $otp_input = $conn->real_escape_string(trim($_POST['otp_code']));
     $current_time = date('Y-m-d H:i:s');
 
-    // រត់ទៅស្វែងរកគណនីយូសឺរតាមរយៈអ៊ីមែលដែលបានកត់ចំណាំទុក
+    // Run to find user accounts via saved emails.
     $query = $conn->query("SELECT * FROM users WHERE email = '$email'");
     
     if ($query->num_rows > 0) {
         $user = $query->fetch_assoc();
 
-        // ១. ឆែកមើលថាតើលេខកូដដែលវាយបញ្ចូល ត្រូវគ្នាជាមួយលេខកូដក្នុង Database ដែរឬទេ
+        // Check if the entered code matches the code in the database.
         if ($user['verification_code'] === $otp_input) {
             
-            // ២. ឆែកមើលប្រព័ន្ធពេលវេលា ថាតើកូដនេះផុតកំណត់ ១៥ នាទីហើយឬនៅ
+            // Check the system time to see if this code has expired in 15 minutes.
             if (strtotime($current_time) <= strtotime($user['code_expires_at'])) {
                 
-                // 🏆 កូដត្រឹមត្រូវ និងស្ថិតក្នុងម៉ោងសុពលភាព ➔ ធ្វើបច្ចុប្បន្នភាពបើកអាខោនភ្លាម
                 $update = $conn->query("UPDATE users SET is_active = 1, verification_code = NULL, code_expires_at = NULL WHERE email = '$email'");
                 
                 if ($update) {
-                    unset($_SESSION['verify_email']); // លុបកត់សម្គាល់អ៊ីមែលចោលដើម្បីសម្អាត Session យាមផ្លូវ
+                    unset($_SESSION['verify_email']); // Delete email notifications to clear the session.
                     
-                    $_SESSION['register_success'] = 'ផ្ទៀងផ្ទាត់អ៊ីមែលពិតប្រាកដជោគជ័យហើយ! អាច Login ចូលប្រព័ន្ធបាន។';
-                    $_SESSION['active_form'] = 'login'; // បង្ខំឱ្យផ្ទាំងទម្រង់លោតទៅខាង Login អូតូ
+                    $_SESSION['register_success'] = 'Email verification successful! You can log in to the system.';
+                    $_SESSION['active_form'] = 'login'; // Force the form pane to jump to the Auto Login side.
                     
                     header("Location: index.php");
                     exit();
                 } else {
-                    $error_msg = 'ជួបបញ្ហាបច្ចេកទេសក្នុងការរក្សាទុកទិន្នន័យ៖ ' . $conn->error;
+                    $error_msg = 'Experiencing technical problems storing data: ' . $conn->error;
                 }
             } else {
-                $error_msg = '❌ លេខកូដ OTP នេះបានផុតកំណត់ (Expired) រយៈពេល ១៥នាទីហើយ!';
+                $error_msg = 'This OTP code has expired for 15 minutes!';
             }
         } else {
-            $error_msg = '❌ លេខកូដ OTP មិនត្រឹមត្រូវទេ! សូមពិនិត្យមើលសារក្នុងអ៊ីមែលឡើងវិញ។';
+            $error_msg = 'The OTP code is incorrect! Please check the email again.';
         }
     } else {
-        $error_msg = 'រកមិនឃើញគណនីអ៊ីមែលនេះនៅក្នុងប្រព័ន្ធឡើយ!';
+        $error_msg = 'This email account was not found in the system.!';
     }
 }
 ?>
