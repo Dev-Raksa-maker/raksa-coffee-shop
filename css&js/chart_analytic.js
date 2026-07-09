@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 scales: {
                     x: {
-                        stacked: false, // ដាក់ false ដើម្បីឱ្យសសរឈរក្បែរគ្នា ងាយស្រួលប្រៀបធៀប
+                        stacked: false, // Set to false to make columns stand side by side for easy comparison
                         grid: { display: false },
                         border: { display: false }
                     },
