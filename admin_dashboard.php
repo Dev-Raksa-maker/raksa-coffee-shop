@@ -41,7 +41,7 @@ if($chart_exp_query) {
 $sql = "SELECT * FROM staff ORDER BY staff_id ASC";
 $result = mysqli_query($conn, $sql);
 
-// ៣. ប្រព័ន្ធ Notification (SOS)
+// Notification (SOS)
 $count_query = mysqli_query($conn, "SELECT COUNT(id) AS total_unread FROM notifications WHERE status = 'unread'");
 $count_result = mysqli_fetch_assoc($count_query);
 $unread_count = $count_result['total_unread'] ?? 0;
