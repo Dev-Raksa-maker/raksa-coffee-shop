@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    $user_id     = intval($_POST['user_id']); 
     $item_id     = intval($_POST['item_id']);
     $supplier_id = intval($_POST['supplier_id']);
     $qty         = floatval($_POST['qty']);
@@ -22,17 +23,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // purchase_orders 
-    $sql_order = "INSERT INTO purchase_orders (order_date, total_amount, status, supplier_id, branch_id) 
-                  VALUES (NOW(), '$total_amount', 'Completed', '$supplier_id', 1)";
+    $sql_order = "INSERT INTO purchase_orders (order_date, total_amount, status, supplier_id, branch_id, user_id) 
+                  VALUES (NOW(), '$total_amount', 'Completed', '$supplier_id', 1, '$user_id')";
     
     if ($conn->query($sql_order) === TRUE) {
         
         $po_id = $conn->insert_id;
 
-        // purchase_order_details
-        $sql_details = "INSERT INTO purchase_order_details (qty, unit_price, line_total, po_id, item_id) 
-                        VALUES ('$qty', '$unit_price', '$line_total', '$po_id', '$item_id')";
+        $sql_details = "INSERT INTO purchase_order_details (qty, unit_price, line_total, po_id, item_id, user_id) 
+                        VALUES ('$qty', '$unit_price', '$line_total', '$po_id', '$item_id', '$user_id')";
         
         if ($conn->query($sql_details) === TRUE) {
 

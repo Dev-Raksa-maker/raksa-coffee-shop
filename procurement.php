@@ -47,6 +47,11 @@
                         <form id="restockForm" class="needs-validation" novalidate action="process_restock.php" method="POST">
 
                             <div class="mb-3">
+                                <label class="text-secondary small fw-bold">User ID<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="user_id" id="userId" value="<?php echo $_SESSION['user_id']; ?>" readonly>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="text-secondary small fw-bold">Item Name</label>
                                 <select class="form-select" name="item_id" required>
                                     <option value="" selected disabled>-- Select Item --</option>

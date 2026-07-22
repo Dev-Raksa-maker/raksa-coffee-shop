@@ -92,7 +92,7 @@ $recent_orders = mysqli_query($conn, "SELECT * FROM orders ORDER BY order_id DES
 </head>
 <body>
 
-     <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4 px-4 py-2 fixed-top"> 
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4 px-4 py-2 fixed-top"> 
         <div class="container-fluid">
             
             <div class="card" style="width: 5rem;">
